@@ -23,5 +23,75 @@
         "description": "insert a blank line below every line which matches \"regex\"",
         "command": "sed '/regex/G'",
         "id": "sed5"
+    },
+    {
+        "description": "insert a blank line above and below every line which matches \"regex\"",
+        "command": "sed '/regex/{x;p;x;G;}'",
+        "id": "sed6"
+    },
+    {
+        "description": "number each line of a file (simple left alignment).",
+        "command": "sed = filename | sed 'N;s/\n/\t/'",
+        "id": "sed6"
+    },
+    {
+        "description": "count lines (emulates \"wc -l\")",
+        "command": "sed -n '$='",
+        "id": "sed7"
+    },
+    {
+        "description": "delete leading whitespace (spaces, tabs) from front of each line",
+        "command": "sed 's/^[ \t]*//'",
+        "id": "sed8"
+    },
+    {
+        "description": "delete trailing whitespace (spaces, tabs) from end of each line",
+        "command": "sed 's/[ \t]*$//'",
+        "id": "sed9"
+    },
+    {
+        "description": "delete BOTH leading and trailing whitespace from each line",
+        "command": "sed 's/^[ \t]*//;s/[ \t]*$//'",
+        "id": "sed10"
+    },
+    {
+        "description": "insert 5 blank spaces at beginning of each line (make page offset)",
+        "command": "sed 's/^/     /'",
+        "id": "sed11"
+    },
+    {
+        "description": "substitute 1st instance of \"foo\" with \"bar\" on each line",
+        "command": "sed 's/foo/bar/'",
+        "id": "sed12"
+    },
+    {
+        "description": "substitute 4th instance of \"foo\" with \"bar\" on each line",
+        "command": "sed 's/foo/bar/4'",
+        "id": "sed13"
+    },
+    {
+        "description": "substitute ALL instance of \"foo\" with \"bar\" on each line",
+        "command": "sed 's/foo/bar/g'",
+        "id": "sed14"
+    },
+    {
+        "description": "substitute next-to-last instance of \"foo\" with \"bar\" on each line",
+        "command": "sed 's/\\(.*\\)foo\\(.*foo\\)/\\1bar\\2/'",
+        "id": "sed15"
+    },
+    {
+        "description": "substitute last instance of \"foo\" with \"bar\" on each line",
+        "command": "sed 's/\\(.*\\)foo/\\1bar/'",
+        "id": "sed16"
+    },
+    {
+        "description": "substitute \"foo\" with \"bar\" ONLY for lines which contain \"baz\"",
+        "command": "sed '/baz/s/foo/bar/g'",
+        "id": "sed17"
+    },
+    {
+        "description": "substitute \"foo\" with \"bar\" EXCEPT for lines which contain \"baz\"",
+        "command": "sed '/baz/!s/foo/bar/g'",
+        "id": "sed18"
     }
 ]
