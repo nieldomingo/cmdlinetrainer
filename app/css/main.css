@@ -3,3 +3,16 @@
 /* ==========================================================================
    Author's custom styles
    ========================================================================== */
+
+#elapsed_progress .bar {
+/*
+    -webkit-transition: width 0.05 ease;
+    -moz-transition: width 0.05 ease;
+    -o-transition: width 0.05 ease;
+    transition: width 0.05 ease;
+*/
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    transition: none;
+}

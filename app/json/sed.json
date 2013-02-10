@@ -1,22 +1,27 @@
 [
     {
-        "description": "description1",
-        "command": "command"
+        "description": "double space a file",
+        "command": "sed G",
+        "id": "sed1"
     },
     {
-        "description": "description2",
-        "command": "command"
+        "description": "triple space a file",
+        "command": "sed 'G;G'",
+        "id": "sed2"
     },
     {
-        "description": "description3",
-        "command": "command"
+        "description": "undo double-spacing (assumes even-numbered lines are always blank)",
+        "command": "sed 'n;d'",
+        "id": "sed3"
     },
     {
-        "description": "description4",
-        "command": "command"
+        "description": "insert a blank line above every line which matches \"regex\"",
+        "command": "sed '/regex/{x;p;x;}'",
+        "id": "sed4"
     },
     {
-        "description": "description5",
-        "command": "command"
+        "description": "insert a blank line below every line which matches \"regex\"",
+        "command": "sed '/regex/G'",
+        "id": "sed5"
     }
 ]

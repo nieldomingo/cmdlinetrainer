@@ -15,13 +15,25 @@
                             section: sectionId
                     };
                 this.render('js/tpl/section.mustache', d).swap(function() {
-                    var questionState = {},
-                        numQuestions = 10,
-                        nextQuestion = function () {
+                    var questionState={},
+                        numQuestions=10,
+                        qSession=null,
+                        qIndex=null,
+                        qNum=null,
+                        sessionOn=false,
+                        correctAnswers=0,
+                        wrongAnswers=0,
+                        timeToAnswer=30000,
+                        nextQuestion=function () {
                             return Math.floor(Math.random() * data.length);
                         },
                         startSeries = function (evt) {
-                            var qIndex = nextQuestion();
+                            qIndex = nextQuestion();
+                            qNum = 0;
+                            qSession = new Date().getTime() / 1000;
+                            sessionOn = true;
+                            correctAnswers = 0;
+                            wrongAnswers = 0;
 
                             if (!$('#start_question').hasClass('disabled')) {
                                 $('#start_question').addClass('disabled');
@@ -32,9 +44,16 @@
                             }
                             $('#command_question').show();
 
-                            $(window).trigger('question', [qIndex, 0]);
+                            $('#correct_answers').text('0');
+                            $('#wrong_answers').text('0');
+
+                            $(questionState).trigger('question', [qIndex, 0]);
                         },
                         endSeries = function (evt) {
+                            sessionOn = false;
+                            stateKey = String(qIndex) + ':' + String(qNum) + ':' + String(qSession),
+                            questionState[stateKey] = 'done';
+
                             $('#stop_question').addClass('disabled');
                             $('#stop_question').attr('disabled', true);
                             
@@ -45,37 +64,94 @@
 
                             console.log("end of questions");
                         },
-                        startQuestion = function (evt, qIndex, qNum) {
+                        startQuestion = function (evt) {
                             var question = data[qIndex],
                                 cmdDescription = question['description'],
                                 cmdAnswer = question['command'],
-                                stateKey = String(qIndex) + ':' + String(qNum),
-                                nextQIndex = nextQuestion();
+                                stateKey = String(qIndex) + ':' + String(qNum) + ':' + String(qSession),
+                                nextQIndex = nextQuestion(),
+                                startTime = new Date().getTime(),
+                                updateTime = function () {
+                                    var currTime=new Date().getTime() - startTime,
+                                        pctTime=(currTime / timeToAnswer) * 100.0,
+                                        pctWidth=String(pctTime) + '%';
+
+                                    if (questionState[stateKey] == 'ongoing' && sessionOn == true) {
+                                        
+                                        $('#elapsed_progress .bar').css('width', pctWidth);
+                                        setTimeout(updateTime, 50);
+                                    }
+
+                                };
                             
                             $('#command_description').text(cmdDescription);
+                            $('#command_answer').val('');
+                            $('#command_answer').focus();
+                            $('#elapsed_progress .bar').css('width', '0%');
+                            $('#command_hint').text('');
 
                             questionState[stateKey]= 'ongoing';
+                            
+                            setTimeout(function () {
+                                    if (questionState[stateKey] == 'ongoing' && sessionOn == true) {
+                                        $('#command_hint').text(cmdAnswer);
+                                    }
+                            }, timeToAnswer / 4);
 
                             setTimeout(function () {
-                                    if (questionState[stateKey] == 'ongoing') {
+                                    if (questionState[stateKey] == 'ongoing' && sessionOn == true) {
                                         console.log("time's up");
                                         questionState[stateKey] = 'done';
+                                        $('#elapsed_progress .bar').css('width', '100%');
+                                        wrongAnswers += 1;
+                                        $('#wrong_answers').text(String(wrongAnswers));
+                                        qNum = qNum + 1;
                                         if (qNum < numQuestions) {
-                                            $(window).trigger('question',
-                                                            [nextQIndex,
-                                                             qNum + 1]);
+                                            qIndex = nextQIndex;
+                                            $(questionState).trigger('question')
                                         }
                                         else {
-                                            $(window).trigger('endseries');
+                                            $(questionState).trigger('endseries');
                                         }
                                     }
-                            }, 5000);
+                            }, timeToAnswer);
+
+                            updateTime(stateKey);
+
                         },
                         answerQuestion = function(evt) {
+                            var answer = $('#command_answer').val(),
+                                question = data[qIndex],
+                                cmdAnswer = question['command'],
+                                stateKey = String(qIndex) + ':' + String(qNum) + ':' + String(qSession),
+                                nextQIndex = nextQuestion();
+
+                                if (answer == cmdAnswer) {
+                                    console.log('answer correct');
+                                    correctAnswers += 1;
+                                    $('#correct_answers').text(String(correctAnswers));
+                                }
+                                else {
+                                    console.log('answer wrong');
+                                    wrongAnswers += 1;
+                                    $('#wrong_answers').text(String(wrongAnswers));
+                                }
+
+                                questionState[stateKey] = 'answered';
+
+                                qNum = qNum + 1;
+                                if (qNum < numQuestions) {
+                                    qIndex = nextQIndex;
+                                    $(questionState).trigger('question')
+                                }
+                                else {
+                                    $(questionState).trigger('endseries');
+                                }
+
                         };
 
-                    $(window).bind('question', startQuestion);
-                    $(window).bind('endseries', endSeries);
+                    $(questionState).bind('question', startQuestion);
+                    $(questionState).bind('endseries', endSeries);
 
                     $('#stop_question').addClass('disabled');
                     $('#stop_question').attr('disabled', true);
@@ -83,6 +159,14 @@
                     $('#command_question').hide();
                     
                     $('#start_question').click(startSeries);
+                    $('#stop_question').click(endSeries);
+                    $('#submit_command').click(answerQuestion);
+                    $('#command_answer').bind('keypress', function (evt) {
+                        if (evt.keyCode == 13) {
+                            evt.preventDefault();
+                            answerQuestion();
+                        }
+                    });
 
                     /*
                     $('#start_question').click(function() {

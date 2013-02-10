@@ -16,7 +16,39 @@
        class="lead">
         Description
     </p>
-    <form>
+    <div class="progress"
+         id="elapsed_progress">
+        <div class="bar" style="width: 0%;"></div>
+    </div>
+    <div class="well well-large">
+        <table class="table">
+            <tr>
+                <td>
+                    <strong>Hint:</strong>
+                </td>
+                <td>
+                    <span id="command_hint"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>Correct:</strong>
+                </td>
+                <td>
+                    <span id="correct_answers">0</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>Wrong:</strong>
+                </td>
+                <td>
+                    <span id="wrong_answers">0</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <form id="command_form">
         <fieldset>
             <div>
                 <input type="text"
