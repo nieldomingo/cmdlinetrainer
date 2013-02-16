@@ -1,6 +1,9 @@
 
 (function ($) {
-    var app = Sammy('#main', function () {
+    var printStatus = function(msg) {
+            $('#status_message').text(msg);
+        },
+        app = Sammy('#main', function () {
 
         this.use('Mustache');
 
@@ -23,7 +26,8 @@
                         sessionOn=false,
                         correctAnswers=0,
                         wrongAnswers=0,
-                        timeToAnswer=30000,
+                        timeToAnswer=10000,
+                        timedMode=false,
                         nextQuestion=function () {
                             return Math.floor(Math.random() * data.length);
                         },
@@ -83,12 +87,15 @@
                                     }
 
                                 };
+
+                            timedMode = true;
                             
                             $('#command_description').text(cmdDescription);
                             $('#command_answer').val('');
                             $('#command_answer').focus();
                             $('#elapsed_progress .bar').css('width', '0%');
                             $('#command_hint').text('');
+                            printStatus('Ongoing...');
 
                             questionState[stateKey]= 'ongoing';
                             
@@ -105,6 +112,7 @@
                                         $('#elapsed_progress .bar').css('width', '100%');
                                         wrongAnswers += 1;
                                         $('#wrong_answers').text(String(wrongAnswers));
+                                        /*
                                         qNum = qNum + 1;
                                         if (qNum < numQuestions) {
                                             qIndex = nextQIndex;
@@ -113,45 +121,60 @@
                                         else {
                                             $(questionState).trigger('endseries');
                                         }
+                                        */
+                                        $(questionState).trigger('graceperiod');
                                     }
                             }, timeToAnswer);
 
                             updateTime(stateKey);
 
                         },
-                        answerQuestion = function(evt) {
+                        answerQuestion = function(timedMode) {
                             var answer = $('#command_answer').val(),
                                 question = data[qIndex],
                                 cmdAnswer = question['command'],
-                                stateKey = String(qIndex) + ':' + String(qNum) + ':' + String(qSession),
-                                nextQIndex = nextQuestion();
+                                stateKey = String(qIndex) + ':' + String(qNum) + ':' + String(qSession);
 
-                                if (answer == cmdAnswer) {
-                                    console.log('answer correct');
+                            questionState[stateKey] = 'answered';
+
+                            if (answer == cmdAnswer) {
+                                nextQIndex = nextQuestion();
+                                console.log('answer correct');
+
+                                if (timedMode) {
                                     correctAnswers += 1;
                                     $('#correct_answers').text(String(correctAnswers));
                                 }
-                                else {
-                                    console.log('answer wrong');
-                                    wrongAnswers += 1;
-                                    $('#wrong_answers').text(String(wrongAnswers));
-                                }
-
-                                questionState[stateKey] = 'answered';
-
                                 qNum = qNum + 1;
                                 if (qNum < numQuestions) {
                                     qIndex = nextQIndex;
-                                    $(questionState).trigger('question')
+                                    $(questionState).trigger('question');
                                 }
                                 else {
                                     $(questionState).trigger('endseries');
                                 }
+                            }
+                            else {
+                                console.log('answer wrong');
+                                wrongAnswers += 1;
+                                $('#wrong_answers').text(String(wrongAnswers));
 
+                                $('#elapsed_progress .bar').css('width', '100%');
+                                printStatus('Wrong answer... Copy hint for now');
+                                $('#command_hint').text(cmdAnswer);
+                            }
+                            
+                        },
+                        gracePeriod = function(evt) {
+                            printStatus('Time\'s up... Copy hint for now');
+                            timedMode = false;
+
+                            $('#command_answer').focus();
                         };
 
                     $(questionState).bind('question', startQuestion);
                     $(questionState).bind('endseries', endSeries);
+                    $(questionState).bind('graceperiod', gracePeriod);
 
                     $('#stop_question').addClass('disabled');
                     $('#stop_question').attr('disabled', true);
@@ -160,7 +183,10 @@
                     
                     $('#start_question').click(startSeries);
                     $('#stop_question').click(endSeries);
-                    $('#submit_command').click(answerQuestion);
+                    $('#submit_command').click(function () {
+                        timedMode = false;
+                        answerQuestion(timedMode);
+                    });
                     $('#command_answer').bind('keypress', function (evt) {
                         if (evt.keyCode == 13) {
                             evt.preventDefault();

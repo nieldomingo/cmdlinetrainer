@@ -16,3 +16,7 @@
     -o-transition: none;
     transition: none;
 }
+
+#question_table .col_1 {
+    width: 200px;
+}

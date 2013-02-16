@@ -21,9 +21,10 @@
         <div class="bar" style="width: 0%;"></div>
     </div>
     <div class="well well-large">
-        <table class="table">
+        <table class="table"
+               id="question_table">
             <tr>
-                <td>
+                <td class="col_1">
                     <strong>Hint:</strong>
                 </td>
                 <td>
@@ -44,6 +45,14 @@
                 </td>
                 <td>
                     <span id="wrong_answers">0</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>Status Message:</strong>
+                </td>
+                <td>
+                    <span id="status_message"></span>
                 </td>
             </tr>
         </table>

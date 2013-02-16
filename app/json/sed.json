@@ -31,7 +31,7 @@
     },
     {
         "description": "number each line of a file (simple left alignment).",
-        "command": "sed = filename | sed 'N;s/\n/\t/'",
+        "command": "sed = filename | sed 'N;s/\\n/\\t/'",
         "id": "sed6"
     },
     {
@@ -41,17 +41,17 @@
     },
     {
         "description": "delete leading whitespace (spaces, tabs) from front of each line",
-        "command": "sed 's/^[ \t]*//'",
+        "command": "sed 's/^[ \\t]*//'",
         "id": "sed8"
     },
     {
         "description": "delete trailing whitespace (spaces, tabs) from end of each line",
-        "command": "sed 's/[ \t]*$//'",
+        "command": "sed 's/[ \\t]*$//'",
         "id": "sed9"
     },
     {
         "description": "delete BOTH leading and trailing whitespace from each line",
-        "command": "sed 's/^[ \t]*//;s/[ \t]*$//'",
+        "command": "sed 's/^[ \\t]*//;s/[ \\t]*$//'",
         "id": "sed10"
     },
     {
