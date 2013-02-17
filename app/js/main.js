@@ -28,6 +28,29 @@
                 $('#' + this.wrongCntId).text(String(this.wrongCnt));
             }
         },
+        topButtons = {
+            startQuestionId: 'start_question',
+            stopQuestionId: 'stop_question',
+            questionPaneId: 'command_question',
+            startMode: function () {
+                $('#' + this.startQuestionId).addClass('disabled');
+                $('#' + this.startQuestionId).attr('disabled', true);
+                
+                $('#' + this.stopQuestionId).removeClass('disabled');
+                $('#' + this.stopQuestionId).attr('disabled', false);
+                
+                $('#' + this.questionPaneId).show();
+            },
+            stopMode: function () {
+                $('#' + this.stopQuestionId).addClass('disabled');
+                $('#' + this.stopQuestionId).attr('disabled', true);
+                
+                $('#' + this.startQuestionId).removeClass('disabled');
+                $('#' + this.startQuestionId).attr('disabled', false);
+                
+                $('#' + this.questionPaneId).hide();
+            }
+        },
         app = Sammy('#main', function () {
 
             this.use('Mustache');
@@ -62,14 +85,7 @@
                                 qSession = new Date().getTime() / 1000;
                                 sessionOn = true;
 
-                                if (!$('#start_question').hasClass('disabled')) {
-                                    $('#start_question').addClass('disabled');
-                                    $('#start_question').attr('disabled', true);
-                                    
-                                    $('#stop_question').removeClass('disabled');
-                                    $('#stop_question').attr('disabled', false);
-                                }
-                                $('#command_question').show();
+                                topButtons.startMode();
                                 
                                 statusTable.resetCnts();
 
@@ -80,13 +96,7 @@
                                 stateKey = String(qIndex) + ':' + String(qNum) + ':' + String(qSession),
                                 questionState[stateKey] = 'done';
 
-                                $('#stop_question').addClass('disabled');
-                                $('#stop_question').attr('disabled', true);
-                                
-                                $('#start_question').removeClass('disabled');
-                                $('#start_question').attr('disabled', false);
-                            
-                                $('#command_question').hide();
+                                statusTable.stopMode();
 
                                 console.log("end of questions");
                             },
